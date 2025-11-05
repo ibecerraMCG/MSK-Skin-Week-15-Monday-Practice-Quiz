@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 15 Monday Practice Quiz</title>
+    <style>
+        /* --- Color Variables --- */
+        :root {
+            /* Default: Dark Theme */
+            --bg-color: #2d343e;
+            /* Dark background */
+            --container-bg: #3c424f;
+            /* Slightly lighter container */
+            --text-color: #e8e6e3;
+            /* Light text */
+            --question-text-color: #8ab4f8;
+            /* Light blue for questions */
+            --lo-text-color: #b0c4de;
+            /* Lighter blue for learning objective */
+            --border-color: #555;
+            /* Darker borders */
+            --separator-color: #4a4f5a;
+            --label-bg: #454c5a;
+            --label-border: #6c757d;
+            --label-hover-bg: #525966;
+            --label-hover-border: #7a828a;
+            --button-bg: #8ab4f8;
+            --button-text: #202124;
+            --button-hover-bg: #a3c5f9;
+            --button-disabled-bg: #5f6368;
+            --feedback-correct-bg: #344e41;
+            --feedback-correct-text: #c7f9cc;
+            --feedback-correct-border: #52b788;
+            --feedback-incorrect-bg: #5e2129;
+            --feedback-incorrect-text: #f8d7da;
+            --feedback-incorrect-border: #a4133c;
+            --feedback-rationale-text: #adb5bd;
+            /* Lighter gray for rationale */
+            --feedback-source-text: #c7d3e0;
+            --feedback-separator: #6c757d;
+            --radio-accent: #8ab4f8;
+        }
+
+        .light-theme {
+            --bg-color: #eef2f7;
+            --container-bg: #ffffff;
+            --text-color: #343a40;
+            --question-text-color: #0056b3;
+            --lo-text-color: #5a6e8a;
+            --border-color: #dee2e6;
+            --separator-color: #e9ecef;
+            --label-bg: #f8f9fa;
+            --label-border: #ced4da;
+            --label-hover-bg: #e2e6ea;
+            --label-hover-border: #adb5bd;
+            --button-bg: #007bff;
+            --button-text: white;
+            --button-hover-bg: #0056b3;
+            --button-disabled-bg: #6c757d;
+            --feedback-correct-bg: #d1e7dd;
+            --feedback-correct-text: #0f5132;
+            --feedback-correct-border: #badbcc;
+            --feedback-incorrect-bg: #f8d7da;
+            --feedback-incorrect-text: #842029;
+            --feedback-incorrect-border: #f5c2c7;
+            --feedback-rationale-text: #495057;
+            --feedback-source-text: #343a40;
+            --feedback-separator: #ccc;
+            --radio-accent: #007bff;
+        }
+
+        /* --- General Styles --- */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            line-height: 1.7;
+            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-bottom: 40px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        #theme-toggle-button {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            padding: 8px 12px;
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            border: 1px solid var(--label-border);
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            z-index: 1000;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        #theme-toggle-button:hover {
+            opacity: 0.8;
+        }
+
+        #quiz-container {
+            max-width: 900px;
+            margin: 80px auto 30px auto;
+            background: var(--container-bg);
+            padding: 25px 35px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border-color);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .question-block {
+            margin-bottom: 35px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid var(--separator-color);
+            transition: border-color 0.3s;
+        }
+
+        .question-block:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 5px;
+        }
+
+        .learning-objective {
+            font-size: 0.85em;
+            font-style: italic;
+            color: var(--lo-text-color);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed var(--separator-color);
+        }
+
+        .question-text {
+            font-weight: 600;
+            font-size: 1.1em;
+            margin-bottom: 18px;
+            color: var(--question-text-color);
+            transition: color 0.3s;
+        }
+
+        .options label {
+            display: block;
+            margin-bottom: 12px;
+            cursor: pointer;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid var(--label-border);
+            background-color: var(--label-bg);
+            transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+        }
+
+        .options label:hover {
+            background-color: var(--label-hover-bg);
+            border-color: var(--label-hover-border);
+        }
+
+        .options input[type="radio"]:checked+span {
+            font-weight: bold;
+            color: var(--question-text-color);
+        }
+
+        .options input[type="radio"] {
+            margin-right: 12px;
+            accent-color: var(--radio-accent);
+        }
+
+        .button-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .check-button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: background-color 0.2s, color 0.2s, opacity 0.2s;
+            background-color: var(--button-bg);
+            color: var(--button-text);
+        }
+
+        .check-button:hover {
+            opacity: 0.85;
+        }
+
+        .check-button:disabled {
+            background-color: var(--button-disabled-bg);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            font-size: 0.95em;
+            display: none;
+            border: 1px solid transparent;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+
+        .feedback.correct {
+            background-color: var(--feedback-correct-bg);
+            color: var(--feedback-correct-text);
+            border-color: var(--feedback-correct-border);
+            display: block;
+        }
+
+        .feedback.incorrect {
+            background-color: var(--feedback-incorrect-bg);
+            color: var(--feedback-incorrect-text);
+            border-color: var(--feedback-incorrect-border);
+            display: block;
+        }
+
+        .feedback-status {
+            font-weight: bold;
+            font-size: 1.1em;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .feedback-rationale {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed var(--feedback-separator);
+            font-size: 0.9em;
+            color: var(--feedback-rationale-text);
+            transition: color 0.3s, border-color 0.3s;
+        }
+
+        .feedback-source {
+            margin-top: 10px;
+            font-size: 0.85em;
+            font-style: italic;
+            color: var(--feedback-source-text);
+            background-color: rgba(0, 0, 0, 0.1);
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--question-text-color);
+            margin-top: 30px;
+            margin-bottom: 30px;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <button id="theme-toggle-button">Toggle Theme</button>
+    <h1>Week 15 Monday Practice Quiz</h1>
+    <div id="quiz-container">
+        <!-- Questions will be loaded here by JavaScript -->
+    </div>
+    <script>
+        const quizData = [
+            // Posterior Forearm and Dorsum of Hand Questions
+            {
+                learningObjective: "LO 1 (Posterior Forearm and Dorsum of Hand): Describe the muscles of the extensor (posterior) compartment of the forearm, their organization, actions, and innervation.",
+                question: "A patient is asked to extend their wrist and adduct it (ulnar deviation) against resistance. This action is primarily performed by a muscle that originates from the lateral epicondyle and inserts on the base of the 5th metacarpal. Which muscle is being tested?",
+                options: {
+                    A: "Extensor carpi radialis longus",
+                    B: "Extensor carpi radialis brevis",
+                    C: "Extensor digitorum",
+                    D: "Extensor carpi ulnaris"
+                },
+                correctAnswer: "D",
+                rationale: "The extensor carpi ulnaris is responsible for both extension and adduction (ulnar deviation) of the wrist. It originates from the lateral epicondyle via the common extensor tendon and inserts on the base of the 5th metacarpal.",
+                source: "'Extensor carpi ulnaris... Proximal attachment: Lateral epicondyle of the humerus (common extensor tendon)... Distal attachment: base of the 5th metacarpal... Action: extends and adducts (ulnar deviates) the wrist' (Posterior Forearm and Dorsum of Hand, Slide 23)"
+            },
+            {
+                learningObjective: "LO 1 (Posterior Forearm and Dorsum of Hand): Describe the muscles of the extensor (posterior) compartment of the forearm, their organization, actions, and innervation.",
+                question: "A medical student is dissecting the superficial layer of the posterior forearm. She identifies a group of three muscles known as the \"mobile wad of Henry,\" which includes the brachioradialis, extensor carpi radialis longus, and another muscle. What is the third muscle of this group?",
+                options: {
+                    A: "Extensor carpi radialis brevis",
+                    B: "Extensor digitorum",
+                    C: "Extensor carpi ulnaris",
+                    D: "Anconeus"
+                },
+                correctAnswer: "A",
+                rationale: "The \"mobile wad of Henry\" is a functional group of muscles on the lateral aspect of the forearm, composed of the brachioradialis, extensor carpi radialis longus, and extensor carpi radialis brevis.",
+                source: "'Distal attachments... - Brachioradialis... - Extensor carpi radialis longus... - Extensor carpi radialis brevis... [bracketed together as] \"mobile wad of Henry\"' (Posterior Forearm and Dorsum of Hand, Slide 19)"
+            },
+            {
+                learningObjective: "LO 1 (Posterior Forearm and Dorsum of Hand): Describe the muscles of the extensor (posterior) compartment of the forearm, their organization, actions, and innervation.",
+                question: "A patient has difficulty supinating their forearm. This action is primarily performed by the supinator muscle, which is located in the deep layer of the posterior compartment. What nerve provides motor innervation to the supinator muscle?",
+                options: {
+                    A: "Superficial branch of the radial nerve",
+                    B: "Deep branch of the radial nerve",
+                    C: "Median nerve",
+                    D: "Ulnar nerve"
+                },
+                correctAnswer: "B",
+                rationale: "The supinator muscle is innervated by the deep branch of the radial nerve, which pierces the muscle.",
+                source: "'Supinator... Innervation: deep branch of the radial nerve' (Posterior Forearm and Dorsum of Hand, Slide 27)"
+            },
+            {
+                learningObjective: "LO 2 (Posterior Forearm and Dorsum of Hand): Describe the course and innervations (i.e., muscular and cutaneous innervation) of the radial nerve and its branches and the clinical presentations resulting from common radial nerve injuries.",
+                question: "A patient sustains a mid-humeral shaft fracture, resulting in an injury to the radial nerve as it passes through the radial groove. Which of the following clinical signs would be most expected?",
+                options: {
+                    A: "Inability to flex the fingers (\"claw hand\")",
+                    B: "Loss of sensation over the medial forearm",
+                    C: "Inability to extend the wrist (\"wrist drop\")",
+                    D: "Wasting of the thenar eminence"
+                },
+                correctAnswer: "C",
+                rationale: "The radial nerve innervates the extensor muscles of the forearm. A lesion at the mid-humeral shaft results in paralysis of these muscles, leading to the characteristic \"wrist drop\" where the patient cannot extend their wrist.",
+                source: "'What motor deficits would you see with a mid humeral shaft fracture? - Paralysis/paresis (weakness) of triceps, brachioradialis, supinator, and wrist extensors (wrist drop)' (Posterior Forearm and Dorsum of Hand, Slide 66)"
+            },
+            {
+                learningObjective: "LO 2 (Posterior Forearm and Dorsum of Hand): Describe the course and innervations (i.e., muscular and cutaneous innervation) of the radial nerve and its branches and the clinical presentations resulting from common radial nerve injuries.",
+                question: "During a neurological exam, a physician tests sensation on the skin of the posterior forearm. A deficit in this area would suggest a lesion of the posterior antebrachial cutaneous nerve. This nerve is a direct branch of which major nerve, and where does it typically originate?",
+                options: {
+                    A: "Median nerve, in the cubital fossa",
+                    B: "Ulnar nerve, in the cubital tunnel",
+                    C: "Radial nerve, in the arm",
+                    D: "Axillary nerve, in the quadrangular space"
+                },
+                correctAnswer: "C",
+                rationale: "The posterior antebrachial cutaneous nerve provides sensory innervation to the posterior forearm. It is a branch of the radial nerve that originates proximally in the arm, before the radial nerve enters the forearm.",
+                source: "'Posterior antebrachial cutaneous nerve (sensory) - Branches in the arm and courses distal to the forearm for sensory innervation.' (Posterior Forearm and Dorsum of Hand, Slide 42)"
+            },
+            {
+                learningObjective: "LO 2 (Posterior Forearm and Dorsum of Hand): Describe the course and innervations (i.e., muscular and cutaneous innervation) of the radial nerve and its branches and the clinical presentations resulting from common radial nerve injuries.",
+                question: "A patient presents with weakness in extending the thumb at the metacarpophalangeal and interphalangeal joints. All other extensor muscles of the forearm are functioning normally. This isolated weakness suggests a lesion of the posterior interosseous nerve after it has emerged from which muscle?",
+                options: {
+                    A: "Brachioradialis",
+                    B: "Extensor carpi radialis longus",
+                    C: "Supinator",
+                    D: "Anconeus"
+                },
+                correctAnswer: "C",
+                rationale: "The deep branch of the radial nerve becomes the posterior interosseous nerve after it passes through and emerges from the supinator muscle. It then innervates the deep extensor muscles, including the extensor pollicis longus and brevis.",
+                source: "'Posterior interosseous nerve - Deep branch of the radial nerve has a name change as it emerges from the supinator... Innervates: - Extensor indicis... - Extensor pollicis brevis, - Extensor pollicis longus' (Posterior Forearm and Dorsum of Hand, Slide 48)"
+            },
+            {
+                learningObjective: "LO 3 (Posterior Forearm and Dorsum of Hand): Explain the cutaneous innervation of the posterior forearm and the dorsum of the hand and describe how and why you clinically test the function of these sensory nerves.",
+                question: "A clinician wants to test the sensory integrity of the superficial branch of the radial nerve. Which area on the hand would be the most appropriate location to test for sensation?",
+                options: {
+                    A: "The tip of the index finger",
+                    B: "The hypothenar eminence",
+                    C: "The first dorsal webspace",
+                    D: "The palmar surface of the thumb"
+                },
+                correctAnswer: "C",
+                rationale: "The superficial branch of the radial nerve provides cutaneous sensation to the dorsolateral hand, with the most specific autonomous zone being the skin of the first dorsal webspace between the thumb and index finger.",
+                source: "'Sensory to dorsolateral hand - \"First dorsal webspace\"' (Posterior Forearm and Dorsum of Hand, Slide 45)"
+            },
+            {
+                learningObjective: "LO 3 (Posterior Forearm and Dorsum of Hand): Explain the cutaneous innervation of the posterior forearm and the dorsum of the hand and describe how and why you clinically test the function of these sensory nerves.",
+                question: "A patient has sensory loss on the posterior aspect of their forearm. Sensation on the dorsum of the hand is intact. This pattern suggests a lesion of the posterior antebrachial cutaneous nerve. Why would a lesion isolated to the forearm affecting the radial nerve spare sensation of the posterior forearm?",
+                options: {
+                    A: "The sensory branch for the posterior forearm originates in the cubital fossa.",
+                    B: "The sensory branch for the posterior forearm originates in the arm.",
+                    C: "The sensory branch is from the median nerve.",
+                    D: "The posterior forearm is innervated by the ulnar nerve."
+                },
+                correctAnswer: "B",
+                rationale: "Understanding the origin of nerves is key to localizing lesions. The posterior antebrachial cutaneous nerve branches off the radial nerve in the arm, proximal to the forearm. Therefore, a lesion of the radial nerve within the forearm would not affect the sensation provided by this nerve.",
+                source: "'Key Concept - Understanding the course/origin of nerves is critical to understanding nerve lesions - E.g. the origin of this nerve in the arm explains why forearm lesions of the radial nerve don't affect sensation of the posterior forearm' (Posterior Forearm and Dorsum of Hand, Slide 42)"
+            },
+            {
+                learningObjective: "LO 3 (Posterior Forearm and Dorsum of Hand): Explain the cutaneous innervation of the posterior forearm and the dorsum of the hand and describe how and why you clinically test the function of these sensory nerves.",
+                question: "The skin on the dorsal aspect of the medial one and a half fingers (the little finger and medial half of the ring finger) is innervated by which nerve?",
+                options: {
+                    A: "Radial nerve",
+                    B: "Median nerve",
+                    C: "Ulnar nerve",
+                    D: "Musculocutaneous nerve"
+                },
+                correctAnswer: "C",
+                rationale: "The dorsal cutaneous branches of the ulnar nerve provide sensory innervation to the medial portion of the dorsum of the hand, including the little finger and the medial side of the ring finger.",
+                source: "'Dorsal cutaneous branches of ulnar n. - Ulnar nerve' (Posterior Forearm and Dorsum of Hand, Slide 51)"
+            },
+            {
+                learningObjective: "LO 4 (Posterior Forearm and Dorsum of Hand): Describe the vasculature (arterial and venous) associated with the posterior forearm and dorsum of the hand.",
+                question: "A surgeon needs to ligate the artery that travels with the posterior interosseous nerve between the superficial and deep layers of the extensor muscles. This vessel is a branch of which artery?",
+                options: {
+                    A: "Radial artery",
+                    B: "Brachial artery",
+                    C: "Common interosseous artery",
+                    D: "Anterior interosseous artery"
+                },
+                correctAnswer: "C",
+                rationale: "The posterior interosseous artery arises from the common interosseous artery (which itself is a branch of the ulnar artery) and travels posteriorly to supply the extensor compartment.",
+                source: "'Common interosseous a. - Branch of ulnar... Branches into an anterior and posterior interosseous aa... Posterior interosseous a. - Travels posteriorly to enter posterior compartment' (Posterior Forearm and Dorsum of Hand, Slide 59)"
+            },
+            {
+                learningObjective: "LO 4 (Posterior Forearm and Dorsum of Hand): Describe the vasculature (arterial and venous) associated with the posterior forearm and dorsum of the hand.",
+                question: "An IV line is being placed in a superficial vein on the lateral aspect of the forearm, which originates from the lateral side of the dorsal venous network of the hand. Which vein is this?",
+                options: {
+                    A: "Basilic vein",
+                    B: "Cephalic vein",
+                    C: "Median cubital vein",
+                    D: "Brachial vein"
+                },
+                correctAnswer: "B",
+                rationale: "The cephalic vein is one of the main superficial veins of the upper limb. It originates from the lateral side of the dorsal venous network and ascends on the lateral (radial) aspect of the forearm.",
+                source: "'Cephalic vein – arises from the lateral aspect of the dorsal venous network.' (Posterior Forearm and Dorsum of Hand, Slide 75)"
+            },
+            {
+                learningObjective: "LO 4 (Posterior Forearm and Dorsum of Hand): Describe the vasculature (arterial and venous) associated with the posterior forearm and dorsum of the hand.",
+                question: "The radial artery terminates in the hand by forming an anastomosis with the deep branch of the ulnar artery. This anastomosis primarily forms which structure?",
+                options: {
+                    A: "Superficial palmar arch",
+                    B: "Deep palmar arch",
+                    C: "Dorsal carpal arch",
+                    D: "Princeps pollicis artery"
+                },
+                correctAnswer: "B",
+                rationale: "The radial artery terminates by diving deep into the palm and anastomosing with the deep branch of the ulnar artery, forming the deep palmar arch.",
+                source: "'Terminates in an anastomosis with the deep branch of the ulnar artery - Forms the deep palmar arch.' (Posterior Forearm and Dorsum of Hand, Slide 57)"
+            },
+            {
+                learningObjective: "LO 5 (Posterior Forearm and Dorsum of Hand): Locate and explain the clinical significance of the “anatomical snuffbox” found in the distal posterior forearm.",
+                question: "A patient presents with pain in the anatomical snuffbox after a fall on an outstretched hand. Tenderness to palpation in this specific location is highly suggestive of a fracture of which carpal bone?",
+                options: {
+                    A: "Lunate",
+                    B: "Trapezium",
+                    C: "Hamate",
+                    D: "Scaphoid"
+                },
+                correctAnswer: "D",
+                rationale: "The scaphoid bone forms the floor of the anatomical snuffbox. Therefore, tenderness in this area is a classic clinical sign of a scaphoid fracture, a common injury from a fall on an outstretched hand (FOOSH).",
+                source: "'Clinical significance: palpation - ...Scaphoid and trapezium... Scaphoid fracture - Often results from a fall on an outstretched hand (FOOSH).' (Posterior Forearm and Dorsum of Hand, Slides 32, 33)"
+            },
+            {
+                learningObjective: "LO 5 (Posterior Forearm and Dorsum of Hand): Locate and explain the clinical significance of the “anatomical snuffbox” found in the distal posterior forearm.",
+                question: "The anatomical snuffbox is bounded posteriorly by the tendon of which muscle?",
+                options: {
+                    A: "Extensor pollicis brevis",
+                    B: "Abductor pollicis longus",
+                    C: "Extensor pollicis longus",
+                    D: "Extensor carpi radialis longus"
+                },
+                correctAnswer: "C",
+                rationale: "The anatomical snuffbox is a triangular depression with specific tendinous borders. The posterior (medial) border is formed by the tendon of the extensor pollicis longus.",
+                source: "'Triangular depression bounded by: ...Extensor pollicis longus posteriorly.' (Posterior Forearm and Dorsum of Hand, Slide 32)"
+            },
+            {
+                learningObjective: "LO 5 (Posterior Forearm and Dorsum of Hand): Locate and explain the clinical significance of the “anatomical snuffbox” found in the distal posterior forearm.",
+                question: "A clinician palpates a pulse within the anatomical snuffbox. This pulse is from which artery as it courses towards the palm of the hand?",
+                options: {
+                    A: "Ulnar artery",
+                    B: "Radial artery",
+                    C: "Anterior interosseous artery",
+                    D: "Posterior interosseous artery"
+                },
+                correctAnswer: "B",
+                rationale: "The radial artery passes through the floor of the anatomical snuffbox on its course to the hand. Its pulse can be palpated here, which is a key clinical landmark.",
+                source: "'Clinical significance: palpation - ...Radial artery' (Posterior Forearm and Dorsum of Hand, Slide 32)"
+            },
+            {
+                learningObjective: "LO 6 (Posterior Forearm and Dorsum of Hand): Discuss the clinical presentation and anatomical basis for significant posterior forearm problems including lateral epicondylitis, and mallet finger.",
+                question: "A 45-year-old tennis player presents with pain over the lateral aspect of her elbow. The pain is exacerbated when she extends her wrist against resistance. This condition, commonly known as \"tennis elbow,\" is caused by overuse and degeneration of the common extensor tendon originating from which bony landmark?",
+                options: {
+                    A: "Medial epicondyle",
+                    B: "Lateral epicondyle",
+                    C: "Olecranon process",
+                    D: "Radial head"
+                },
+                correctAnswer: "B",
+                rationale: "Lateral epicondylitis (\"tennis elbow\") is a tendinosis resulting from overuse of the superficial forearm extensor muscles, which share a common tendon of origin at the lateral epicondyle of the humerus.",
+                source: "'Lateral epicondylitis (“tennis elbow”) - Overuse of superficial forearm extensor muscles attached at the lateral epicondyle.' (Posterior Forearm and Dorsum of Hand, Slide 24)"
+            },
+            {
+                learningObjective: "LO 6 (Posterior Forearm and Dorsum of Hand): Discuss the clinical presentation and anatomical basis for significant posterior forearm problems including lateral epicondylitis, and mallet finger.",
+                question: "A baseball catcher sustains an injury to his right long finger when a fastball strikes the tip, forcing the distal interphalangeal (DIP) joint into sudden, extreme flexion. He is now unable to actively extend the DIP joint. This injury is known as a mallet finger and is due to the avulsion or rupture of which structure?",
+                options: {
+                    A: "Flexor digitorum profundus tendon",
+                    B: "Extensor expansion (dorsal hood)",
+                    C: "Lumbrical muscle",
+                    D: "Collateral ligament"
+                },
+                correctAnswer: "B",
+                rationale: "Mallet finger results from sudden severe tension on the long extensor tendon at its insertion on the distal phalanx. This causes a rupture or avulsion of the extensor expansion, leading to a loss of attachment and the inability to extend the DIP joint.",
+                source: "'Mallet Finger - Sudden severe tension on a long extensor tendon may avulse part of its attachment to the phalanx. Loss of attachment to distal phalanx leads to inability to extend DIP.' (Posterior Forearm and Dorsum of Hand, Slide 25)"
+            },
+            {
+                learningObjective: "LO 6 (Posterior Forearm and Dorsum of Hand): Discuss the clinical presentation and anatomical basis for significant posterior forearm problems including lateral epicondylitis, and mallet finger.",
+                question: "A patient diagnosed with lateral epicondylitis is found to have particular weakness and pain with extension and radial deviation of the wrist. Which of the following muscles is most likely involved, given its attachment to the lateral epicondyle and its role in these movements?",
+                options: {
+                    A: "Brachioradialis",
+                    B: "Extensor carpi ulnaris",
+                    C: "Extensor carpi radialis brevis",
+                    D: "Flexor carpi radialis"
+                },
+                correctAnswer: "C",
+                rationale: "The extensor carpi radialis brevis originates from the common extensor tendon at the lateral epicondyle and acts to extend and abduct (radially deviate) the wrist. It is frequently implicated in lateral epicondylitis.",
+                source: "'Extensor carpi radialis brevis... Proximal attachment: Lateral epicondyle of the humerus (common extensor tendon)... Action: extends and abduct (radial deviation) the wrist.' (Posterior Forearm and Dorsum of Hand, Slide 18)"
+            },
+            {
+                learningObjective: "LO 7 (Posterior Forearm and Dorsum of Hand): Identify where a lesion of the brachial plexus is located based on a patient’s clinical presentation.",
+                question: "A newborn is delivered with difficulty, requiring significant traction on the head and neck. Postnatally, the infant presents with an adducted and internally rotated shoulder, an extended elbow, and a pronated forearm, a posture known as \"waiter's tip.\" This clinical presentation is characteristic of an injury to which part of the brachial plexus?",
+                options: {
+                    A: "Inferior trunk (C8, T1)",
+                    B: "Superior trunk (C5, C6)",
+                    C: "Medial cord",
+                    D: "Posterior cord"
+                },
+                correctAnswer: "B",
+                rationale: "An upper brachial plexus injury (Erb-Duchenne Palsy) affects the C5 and C6 nerve roots, which form the superior trunk. This results in paralysis of shoulder and arm muscles supplied by these roots, leading to the classic \"waiter's tip\" deformity.",
+                source: "'Upper brachial plexus injuries (Erb-Duchenne Palsy) ... Affects C5 & C6 roots of the brachial plexus... Symptoms include an upper limb with an adducted shoulder, medially rotated arm, extended elbow, pronated forearm & flexed wrist (“waiter’s tip position”)' (Posterior Forearm and Dorsum of Hand, Slide 76)"
+            },
+            {
+                learningObjective: "LO 7 (Posterior Forearm and Dorsum of Hand): Identify where a lesion of the brachial plexus is located based on a patient’s clinical presentation.",
+                question: "A patient falls from a tree and grabs a branch to break their fall, causing a sudden upward traction injury to their arm. They subsequently develop paralysis of the intrinsic muscles of the hand, resulting in a \"claw hand\" deformity. This presentation is consistent with a lower brachial plexus injury, also known as Klumpke paralysis, affecting which nerve roots?",
+                options: {
+                    A: "C5, C6",
+                    B: "C6, C7",
+                    C: "C7, C8",
+                    D: "C8, T1"
+                },
+                correctAnswer: "D",
+                rationale: "A lower brachial plexus injury (Klumpke Paralysis) results from sudden upward pulling of the arm, injuring the C8 and T1 nerve roots (inferior trunk). This primarily affects the ulnar nerve, leading to paralysis of intrinsic hand muscles and a \"claw hand.\"",
+                source: "'Lower brachial plexus injuries (Klumpke Paralysis) ... Affects C8 & T1 roots of the brachial plexus... Damages the ulnar nerve, affecting the intrinsic muscles of the hand and causing a \"claw hand\".' (Posterior Forearm and Dorsum of Hand, Slide 76)"
+            },
+            {
+                learningObjective: "LO 7 (Posterior Forearm and Dorsum of Hand): Identify where a lesion of the brachial plexus is located based on a patient’s clinical presentation.",
+                question: "A patient presents with weakness in the triceps, wrist extensors, and supinator muscles. There is also sensory loss over the posterior forearm and dorsolateral hand. A nerve conduction study confirms a lesion. These motor and sensory deficits localize the injury to which part of the brachial plexus?",
+                options: {
+                    A: "Musculocutaneous nerve",
+                    B: "Ulnar nerve",
+                    C: "Radial nerve",
+                    D: "Axillary nerve"
+                },
+                correctAnswer: "C",
+                rationale: "The radial nerve originates from the posterior cord and innervates the primary extensors of the arm (triceps) and forearm (wrist extensors), as well as the supinator. It also provides cutaneous sensation to the posterior forearm and dorsolateral hand. The combination of these specific deficits points directly to a radial nerve lesion.",
+                source: "'Radial Nerve... From posterior cord: C5, C6, C7, C8, T1... Motor to the triceps brachii... Paralysis/paresis (weakness) of triceps, brachioradialis, supinator, and wrist extensors (wrist drop)' (Posterior Forearm and Dorsum of Hand, Slides 41, 66)"
+            },
+            {
+                learningObjective: "LO 8 (Posterior Forearm and Dorsum of Hand): Identify anatomical structures associated with the posterior forearm and dorsum of the hand on X-Rays, MRI, and CT scans.",
+                question: "A plain radiograph of the hand following trauma shows a fracture at the base of the first metacarpal. This bone articulates proximally with which carpal bone to form the carpometacarpal joint of the thumb?",
+                options: {
+                    A: "Scaphoid",
+                    B: "Lunate",
+                    C: "Trapezium",
+                    D: "Trapezoid"
+                },
+                correctAnswer: "C",
+                rationale: "The first carpometacarpal joint is a saddle joint formed by the articulation of the base of the first metacarpal with the trapezium. The scaphoid and trapezium are key components of the floor of the anatomical snuffbox.",
+                source: "'Clinical significance: palpation... Scaphoid and trapezium' (Posterior Forearm and Dorsum of Hand, Slide 32)"
+            },
+            {
+                learningObjective: "LO 8 (Posterior Forearm and Dorsum of Hand): Identify anatomical structures associated with the posterior forearm and dorsum of the hand on X-Rays, MRI, and CT scans.",
+                question: "An axial MRI of the wrist is performed to evaluate the contents of the osseofibrous tunnels on the dorsum of the wrist. The extensor retinaculum is visualized holding the extensor tendons in place. Which two bones of the forearm form the floor of these tunnels?",
+                options: {
+                    A: "Humerus and ulna",
+                    B: "Radius and ulna",
+                    C: "Scaphoid and lunate",
+                    D: "Radius and scaphoid"
+                },
+                correctAnswer: "B",
+                rationale: "The osseofibrous tunnels on the dorsum of the wrist are formed by the extensor retinaculum superficially and the distal radius and ulna deep, creating passages for the extensor tendons.",
+                source: "'Osseofibrous tunnels - Formed by extensor retinaculum, radius, and ulna to prevent \"bowstringing\"' (Posterior Forearm and Dorsum of Hand, Slide 35)"
+            },
+            {
+                learningObjective: "LO 8 (Posterior Forearm and Dorsum of Hand): Identify anatomical structures associated with the posterior forearm and dorsum of the hand on X-Rays, MRI, and CT scans.",
+                question: "A lateral X-ray of the elbow is ordered for a patient with posterior elbow pain. The olecranon process is clearly visualized. This large, prominent process is part of which bone?",
+                options: {
+                    A: "Humerus",
+                    B: "Radius",
+                    C: "Ulna",
+                    D: "Scaphoid"
+                },
+                correctAnswer: "C",
+                rationale: "The olecranon process is the prominent bony projection at the proximal end of the ulna that forms the point of the elbow.",
+                source: "'Ulna... Olecranon process' (Posterior Forearm and Dorsum of Hand, Slide 8)"
+            },
+            // Introduction to Rheumatologic Disease Questions
+            {
+                learningObjective: "LO 1 (Introduction to Rheumatologic Disease): Distinguish articular from non-articular disease processes.",
+                question: "A 52-year-old male presents with right knee pain. He reports the pain is generalized deep within the joint and is present during both active and passive range of motion. He experiences discomfort with nearly every movement of his knee. On examination, there is tenderness over the entire joint line and a noticeable effusion. Based on these findings, what is the most likely source of his pain?",
+                options: {
+                    A: "Articular",
+                    B: "Periarticular",
+                    C: "Nonarticular",
+                    D: "Referred Neurologic"
+                },
+                correctAnswer: "A",
+                rationale: "The patient's symptoms of pain throughout the joint area, pain with all directions of movement (both active and passive), and the presence of an effusion are classic signs of an articular source of pain.",
+                source: "'History: Pain in joint area, Pain in all directions of movement. Physical exam: Tenderness +/- swelling of entire joint line, Limited/painful ROM in all directions, Pain with active ROM = passive ROM, Effusion = arthritis' (Introduction to Rheumatologic Disease, Slide 10)"
+            },
+            {
+                learningObjective: "LO 1 (Introduction to Rheumatologic Disease): Distinguish articular from non-articular disease processes.",
+                question: "A 34-year-old runner complains of localized pain on the outside of her left hip. The pain is worse when she actively moves her leg out to the side but is significantly less painful when the examiner passively moves her leg in the same direction. The pain is localized to a specific point and does not involve the entire hip joint. Which category best describes the origin of her pain?",
+                options: {
+                    A: "Articular",
+                    B: "Periarticular",
+                    C: "Nonarticular",
+                    D: "Referred Visceral"
+                },
+                correctAnswer: "B",
+                rationale: "The pain is localized near the joint, is present with only some movements, and is significantly worse with active range of motion compared to passive range of motion. This pattern is characteristic of periarticular structures like tendons or bursae.",
+                source: "'History: Pain localized near joint, Pain with some movements. Physical exam: Tenderness +/- swelling over part of joint, Limited/painful ROM in some directions, Pain with active ROM > passive ROM' (Introduction to Rheumatologic Disease, Slide 11)"
+            },
+            {
+                learningObjective: "LO 1 (Introduction to Rheumatologic Disease): Distinguish articular from non-articular disease processes.",
+                question: "A 60-year-old woman presents with a complaint of \"hurting all over.\" She describes diffuse, widespread pain that does not seem to be related to joint movement. Her physical examination does not reveal specific joint line tenderness, swelling, or effusion, and her range of motion is not a primary contributor to her pain. Her history does not fit a clear anatomical pattern. What is the most likely source of her pain?",
+                options: {
+                    A: "Articular",
+                    B: "Periarticular",
+                    C: "Nonarticular",
+                    D: "Referred Vascular"
+                },
+                correctAnswer: "C",
+                rationale: "The patient's symptoms are diffuse, unrelated to joint range of motion, and do not follow a specific pattern, which is characteristic of nonarticular pain originating from structures like muscles or bones.",
+                source: "'History: “Hurts all over”, diffuse, Unrelated to joint ROM, History doesn’t fit a pattern. Physical exam: Non-articular exam findings, Pain unrelated to joint ROM' (Introduction to Rheumatologic Disease, Slide 12)"
+            },
+            {
+                learningObjective: "LO 2 (Introduction to Rheumatologic Disease): Differentiate inflammatory from non-inflammatory musculoskeletal disorders.",
+                question: "A 48-year-old woman presents with bilateral hand pain. She reports that her joints are stiff for over an hour every morning and the pain improves with activity like knitting. She also notes significant fatigue and unintentional weight loss over the past few months. Which of the following findings would be most consistent with an inflammatory joint disease?",
+                options: {
+                    A: "Morning stiffness lasting less than 20 minutes",
+                    B: "Symptoms worsening with activity",
+                    C: "Gelling that improves after a few minutes of rest",
+                    D: "Presence of systemic symptoms like fatigue"
+                },
+                correctAnswer: "D",
+                rationale: "Inflammatory joint diseases are often associated with systemic symptoms such as significant fatigue, fever, and weight loss, whereas noninflammatory conditions are typically localized to the joint without systemic involvement.",
+                source: "'Feature/symptom: Fatigue, Inflammatory: Significant... Systemic involvement: Yes... Fever, weight loss' (Introduction to Rheumatologic Disease, Slide 16)"
+            },
+            {
+                learningObjective: "LO 2 (Introduction to Rheumatologic Disease): Differentiate inflammatory from non-inflammatory musculoskeletal disorders.",
+                question: "A 65-year-old man with knee pain undergoes arthrocentesis. The synovial fluid is clear, viscous, and has a white blood cell (WBC) count of 500 cells/mm³. Which of the following classifications best fits this synovial fluid analysis?",
+                options: {
+                    A: "Normal",
+                    B: "Non-inflammatory",
+                    C: "Inflammatory",
+                    D: "Septic"
+                },
+                correctAnswer: "B",
+                rationale: "Synovial fluid in non-inflammatory joint disease is characterized by being clear to slightly turbid and viscous, with a WBC count between 200 and 2,000 cells/mm³.",
+                source: "'Class: Non-inflammatory... Appearance: Clear to slightly turbid yellow, viscous. WBC/mm³: 200-2,000' (Introduction to Rheumatologic Disease, Slide 19)"
+            },
+            {
+                learningObjective: "LO 2 (Introduction to Rheumatologic Disease): Differentiate inflammatory from non-inflammatory musculoskeletal disorders.",
+                question: "A 55-year-old woman presents with swollen and painful proximal interphalangeal (PIP) joints. On physical examination, the joints have fusiform swelling and feel \"boggy\" on palpation. There is also noticeable erythema and warmth over the affected joints. These findings are most characteristic of which type of arthritis?",
+                options: {
+                    A: "Noninflammatory arthritis",
+                    B: "Inflammatory arthritis",
+                    C: "Septic arthritis",
+                    D: "Traumatic arthritis"
+                },
+                correctAnswer: "B",
+                rationale: "The presence of fusiform swelling, a \"boggy\" or \"spongy\" feel to the synovium, and erythema with warmth are classic physical exam findings of inflammatory arthritis.",
+                source: "'Inflammatory arthritis: Tenderness, pain with/limited ROM; Fusiform swelling of involved joints, “spongy” or “boggy” to palpation; Erythema, warmth' (Introduction to Rheumatologic Disease, Slide 17)"
+            },
+            {
+                learningObjective: "LO 3 (Introduction to Rheumatologic Disease): Compose a framework for differentiating inflammatory arthritides based on timing, pattern and distribution of joint involvement.",
+                question: "A 30-year-old woman presents with joint pain that started 3 months ago. The pain affects the small joints of both her hands and feet in a symmetric fashion. She reports the pain is additive, with more joints becoming involved over time. Which pattern of joint involvement does this presentation describe?",
+                options: {
+                    A: "Monoarticular and asymmetric",
+                    B: "Oligoarticular and asymmetric",
+                    C: "Polyarticular and symmetric",
+                    D: "Migratory and monoarticular"
+                },
+                correctAnswer: "C",
+                rationale: "The involvement of more than four joints (> 4 joints) is defined as polyarticular. When the same joints are affected on both sides of the body, the pattern is symmetric.",
+                source: "'Pattern: Number of joints... Polyarticular: > 4 joints; Symmetric or asymmetric' (Introduction to Rheumatologic Disease, Slide 25)"
+            },
+            {
+                learningObjective: "LO 3 (Introduction to Rheumatologic Disease): Compose a framework for differentiating inflammatory arthritides based on timing, pattern and distribution of joint involvement.",
+                question: "A 25-year-old male develops sudden, severe pain in his right knee that began 2 weeks ago. He has no other joint complaints. How would this patient's arthritis be classified based on timing and number of joints involved?",
+                options: {
+                    A: "Acute monoarthritis",
+                    B: "Chronic oligoarthritis",
+                    C: "Acute polyarthritis",
+                    D: "Chronic monoarthritis"
+                },
+                correctAnswer: "A",
+                rationale: "The patient's symptoms have been present for less than 6 weeks, which is classified as acute. The involvement of a single joint is defined as monoarticular.",
+                source: "'Timing: Acute (< 6 weeks) or chronic (> 6 weeks)... Pattern: Number of joints... Monoarticular: 1 joint' (Introduction to Rheumatologic Disease, Slide 25)"
+            },
+            {
+                learningObjective: "LO 3 (Introduction to Rheumatologic Disease): Compose a framework for differentiating inflammatory arthritides based on timing, pattern and distribution of joint involvement.",
+                question: "A 42-year-old patient presents with arthritis affecting the right knee, left ankle, and right wrist for the past four months. The joints are involved on both sides of the body but not in the same locations. Which terms best describe the timing and pattern of this patient's arthritis?",
+                options: {
+                    A: "Acute, symmetric oligoarthritis",
+                    B: "Chronic, asymmetric oligoarthritis",
+                    C: "Acute, symmetric polyarthritis",
+                    D: "Chronic, asymmetric polyarthritis"
+                },
+                correctAnswer: "B",
+                rationale: "The duration of over 6 weeks (> 6 weeks) makes this a chronic condition. The involvement of three joints (≤ 4 joints) is classified as oligoarticular, and since the pattern is not a mirror image on both sides, it is asymmetric.",
+                source: "'Timing: ...chronic (> 6 weeks)... Pattern: ...Oligoarticular: ≤ 4 joints; ...asymmetric' (Introduction to Rheumatologic Disease, Slide 25)"
+            },
+            {
+                learningObjective: "LO 4 (Introduction to Rheumatologic Disease): Apply this framework to diagnose rheumatoid arthritis and osteoarthritis.",
+                question: "A 68-year-old woman complains of chronic pain in her distal interphalangeal (DIP) joints and her knees. The pain is worse at the end of the day and after activity. She experiences morning stiffness for about 15 minutes. Which diagnosis is most likely?",
+                options: {
+                    A: "Rheumatoid arthritis",
+                    B: "Psoriatic arthritis",
+                    C: "Osteoarthritis",
+                    D: "Gout"
+                },
+                correctAnswer: "C",
+                rationale: "This presentation is classic for osteoarthritis, which is a noninflammatory arthritis characterized by morning stiffness of short duration (≤ 30 minutes), pain worsening with use, and a distribution that typically involves the DIPs, PIPs, 1st CMC, knees, and hips, while sparing the MCPs and wrists.",
+                source: "'Symptoms: Noninflammatory joint pain... ≤ 30 minutes morning stiffness... Distribution... Involves: Knees, hips, cervical and lumbar spine, 1st CMC, 1st MTP, PIPs, DIPs. Spares: MCPs, wrists' (Introduction to Rheumatologic Disease, Slides 30, 31)"
+            },
+            {
+                learningObjective: "LO 4 (Introduction to Rheumatologic Disease): Apply this framework to diagnose rheumatoid arthritis and osteoarthritis.",
+                question: "A 45-year-old female presents with a 4-month history of symmetric pain and swelling in her metacarpophalangeal (MCP) and proximal interphalangeal (PIP) joints. She has morning stiffness that lasts for 2 hours. Her symptoms improve with activity. Which of the following diagnoses is most consistent with this clinical picture?",
+                options: {
+                    A: "Osteoarthritis",
+                    B: "Rheumatoid arthritis",
+                    C: "Fibromyalgia",
+                    D: "Systemic lupus erythematosus"
+                },
+                correctAnswer: "B",
+                rationale: "Rheumatoid arthritis is an inflammatory arthritis characterized by a chronic (>6 weeks), symmetric, polyarticular pattern that favors small joints like the MCPs and PIPs, while sparing the DIPs. Prolonged morning stiffness (>1 hour) that improves with activity is a hallmark symptom.",
+                source: "'Symptoms: Inflammatory joint pain, Morning stiffness > 1 hour, Improves with activity... Timing: Chronic (> 6 weeks)... Pattern: Polyarticular, Symmetric... Involves: PIPs, MCPs, wrists... Spares: DIPs...' (Introduction to Rheumatologic Disease, Slides 46, 47)"
+            },
+            {
+                learningObjective: "LO 4 (Introduction to Rheumatologic Disease): Apply this framework to diagnose rheumatoid arthritis and osteoarthritis.",
+                question: "A 70-year-old man presents for evaluation of hand pain. X-rays of his hands show asymmetric joint space narrowing, subchondral sclerosis, and osteophyte formation, particularly at the distal interphalangeal (DIP) joints. The metacarpophalangeal (MCP) joints are unaffected. These radiographic findings are most characteristic of which condition?",
+                options: {
+                    A: "Rheumatoid arthritis",
+                    B: "Osteoarthritis",
+                    C: "Gouty arthritis",
+                    D: "Psoriatic arthritis"
+                },
+                correctAnswer: "B",
+                rationale: "The X-ray findings of asymmetric joint space narrowing, osteophytes, and subchondral sclerosis are the classic radiographic features of osteoarthritis. The involvement of DIPs with sparing of the MCPs further supports this diagnosis.",
+                source: "'Imaging [Osteoarthritis]: Osteophytes, asymmetric joint space narrowing, subchondral sclerosis and cysts' (Introduction to Rheumatologic Disease, Slide 54) and 'Osteoarthritis of the hands... Asymmetric joint space narrowing... Subchondral sclerosis' (Introduction to Rheumatologic Disease, Slide 33)"
+            },
+            {
+                learningObjective: "LO 5 (Introduction to Rheumatologic Disease): Explain the pathogenesis of rheumatoid arthritis.",
+                question: "A patient with rheumatoid arthritis is found to have antibodies against the Fc portion of IgG. This finding is central to the autoimmune process in RA. Which of the following autoantibodies does this describe?",
+                options: {
+                    A: "Anti-cyclic citrullinated peptide (Anti-CCP)",
+                    B: "Antinuclear antibody (ANA)",
+                    C: "Rheumatoid factor (RF)",
+                    D: "Anti-double stranded DNA (Anti-dsDNA)"
+                },
+                correctAnswer: "C",
+                rationale: "Rheumatoid factor (RF) is an autoantibody (typically IgM) that targets the Fc region of the patient's own IgG antibodies, forming immune complexes that contribute to the inflammatory process in RA.",
+                source: "'Autoantibodies [Rheumatoid Arthritis]: Rheumatoid factor (RF) [IgM antibody targeting IgG Fc region] [nonspecific]' (Introduction to Rheumatologic Disease, Slide 45)"
+            },
+            {
+                learningObjective: "LO 5 (Introduction to Rheumatologic Disease): Explain the pathogenesis of rheumatoid arthritis.",
+                question: "A 40-year-old smoker is diagnosed with rheumatoid arthritis. Genetic testing reveals the presence of an HLA-DRB1 shared epitope. The combination of smoking and this genetic marker is known to be highly synergistic in the development of RA. This synergy is thought to be mediated through which process?",
+                options: {
+                    A: "Activation of osteoclasts",
+                    B: "DNA methylation",
+                    C: "Citrullination of self-proteins",
+                    D: "Production of inflammatory cytokines"
+                },
+                correctAnswer: "C",
+                rationale: "Environmental risk factors like smoking are thought to promote the citrullination of self-proteins at mucosal surfaces. In genetically susceptible individuals (e.g., those with the shared epitope), these modified proteins can break self-tolerance, leading to the production of autoantibodies like anti-CCP and the development of RA.",
+                source: "'Environmental risk factors... Smoking... Citrullination of self-proteins at mucosal surfaces... Presence of citrullinated self-proteins hypothesized to lead to a break in self-tolerance... Smoking is highly synergistic with genetic predisposition at the shared epitope to cause RA.' (Introduction to Rheumatologic Disease, Slides 37, 38)"
+            },
+            {
+                learningObjective: "LO 5 (Introduction to Rheumatologic Disease): Explain the pathogenesis of rheumatoid arthritis.",
+                question: "A patient with long-standing rheumatoid arthritis undergoes a synovial biopsy. Histologic examination reveals a thick, inflamed synovial membrane with extensive proliferation of synovial cells, inflammatory cells, and granulation tissue that is invading the adjacent cartilage and bone. What is the term for this pathologic structure?",
+                options: {
+                    A: "Osteophyte",
+                    B: "Pannus",
+                    C: "Tophi",
+                    D: "Enthesis"
+                },
+                correctAnswer: "B",
+                rationale: "Pannus is the term for the hypertrophied, hyperplastic synovial membrane that is infiltrated with inflammatory cells in rheumatoid arthritis. This aggressive tissue is responsible for the cartilage and bone erosion characteristic of the disease.",
+                source: "'Synovitis (synovial inflammation), Synovial hyperplasia (pannus)... Influx and proliferation of immune cells, Production of inflammatory cytokines and chemokines, Release of collagenases and metalloproteinases, Activation of osteoclasts' (Introduction to Rheumatologic Disease, Slide 41)"
+            },
+            {
+                learningObjective: "LO 6 (Introduction to Rheumatologic Disease): List the notable extra-articular manifestations of rheumatoid arthritis.",
+                question: "A 58-year-old male with a 15-year history of seropositive rheumatoid arthritis presents with neutropenia and splenomegaly. This constellation of findings is characteristic of which extra-articular manifestation of RA?",
+                options: {
+                    A: "Caplan syndrome",
+                    B: "Sjögren's syndrome",
+                    C: "Felty syndrome",
+                    D: "Amyloidosis"
+                },
+                correctAnswer: "C",
+                rationale: "Felty syndrome is a specific extra-articular manifestation of rheumatoid arthritis defined by the triad of rheumatoid arthritis, neutropenia, and splenomegaly.",
+                source: "'Felty syndrome: Triad of: Rheumatoid arthritis, Neutropenia, Splenomegaly' (Introduction to Rheumatologic Disease, Slide 62)"
+            },
+            {
+                learningObjective: "LO 6 (Introduction to Rheumatologic Disease): List the notable extra-articular manifestations of rheumatoid arthritis.",
+                question: "A 62-year-old woman with rheumatoid arthritis develops firm, non-tender nodules over her elbows and the extensor surface of her forearms. Histological examination of a nodule reveals a central area of fibrinoid necrosis surrounded by palisading histiocytes. What is the most likely diagnosis of these lesions?",
+                options: {
+                    A: "Gouty tophi",
+                    B: "Heberden's nodes",
+                    C: "Calcinosis cutis",
+                    D: "Rheumatoid nodules"
+                },
+                correctAnswer: "D",
+                rationale: "Subcutaneous nodules, particularly over extensor surfaces and pressure points, are a classic extra-articular feature of RA. Their characteristic histology includes central fibrinoid necrosis surrounded by palisading histiocytes.",
+                source: "'Rheumatoid nodules (histology: palisading histiocytes with central fibrinoid necrosis)... Skin: especially extensor surface of forearms' (Introduction to Rheumatologic Disease, Slide 63)"
+            },
+            {
+                learningObjective: "LO 6 (Introduction to Rheumatologic Disease): List the notable extra-articular manifestations of rheumatoid arthritis.",
+                question: "A patient with severe, long-standing rheumatoid arthritis is at an increased risk of sudden death due to atlantoaxial subluxation. This complication results from inflammation and weakening of the transverse ligament. Which part of the spine is uniquely involved in this RA-related process?",
+                options: {
+                    A: "C1-C2",
+                    B: "C5-C6",
+                    C: "Thoracic spine",
+                    D: "Lumbar spine"
+                },
+                correctAnswer: "A",
+                rationale: "The C1-C2 (atlantoaxial) joint is the only spinal joint typically involved in rheumatoid arthritis. Inflammation can lead to instability and subluxation, which can cause spinal cord compression and serious neurological complications.",
+                source: "'*C1-C2 is the only spinal joint that is ever involved in RA... Weakening of the transverse ligament -> Horizontal subluxation (shown) -> spinal cord +/- vertebral artery compression...' (Introduction to Rheumatologic Disease, Slide 53)"
+            }
+        ];
+        const quizContainer = document.getElementById('quiz-container');
+        const themeToggleButton = document.getElementById('theme-toggle-button');
+        const bodyElement = document.body;
+
+        function applyTheme(theme) {
+            if (theme === 'light') {
+                bodyElement.classList.add('light-theme');
+                themeToggleButton.textContent = 'Switch to Dark Mode';
+            } else {
+                bodyElement.classList.remove('light-theme');
+                themeToggleButton.textContent = 'Switch to Light Mode';
+            }
+            localStorage.setItem('quizTheme', theme);
+        }
+
+        function loadQuiz() {
+            quizData.forEach((qData, index) => {
+                const questionBlock = document.createElement('div');
+                questionBlock.classList.add('question-block');
+                questionBlock.id = `q${index}`;
+
+                const loText = document.createElement('div');
+                loText.classList.add('learning-objective');
+                loText.textContent = qData.learningObjective;
+                questionBlock.appendChild(loText);
+
+                const questionText = document.createElement('p');
+                questionText.classList.add('question-text');
+                questionText.innerHTML = `${index + 1}. ${qData.question}`;
+                questionBlock.appendChild(questionText);
+
+                const optionsDiv = document.createElement('div');
+                optionsDiv.classList.add('options');
+                for (const optionKey in qData.options) {
+                    const optionId = `q${index}_${optionKey}`;
+                    const label = document.createElement('label');
+                    label.htmlFor = optionId;
+
+                    const radioInput = document.createElement('input');
+                    radioInput.type = 'radio';
+                    radioInput.name = `q${index}`;
+                    radioInput.value = optionKey;
+                    radioInput.id = optionId;
+
+                    const labelText = document.createElement('span');
+                    labelText.textContent = ` ${optionKey}. ${qData.options[optionKey]}`;
+
+                    label.appendChild(radioInput);
+                    label.appendChild(labelText);
+                    optionsDiv.appendChild(label);
+                }
+                questionBlock.appendChild(optionsDiv);
+
+                const buttonContainer = document.createElement('div');
+                buttonContainer.classList.add('button-container');
+
+                const checkButton = document.createElement('button');
+                checkButton.textContent = 'Check Answer';
+                checkButton.classList.add('check-button');
+                checkButton.onclick = () => checkAnswer(index);
+                buttonContainer.appendChild(checkButton);
+                questionBlock.appendChild(buttonContainer);
+
+                const feedbackDiv = document.createElement('div');
+                feedbackDiv.classList.add('feedback');
+                questionBlock.appendChild(feedbackDiv);
+
+                quizContainer.appendChild(questionBlock);
+            });
+        }
+
+        function checkAnswer(questionIndex) {
+            const questionBlockElement = document.getElementById(`q${questionIndex}`);
+            const selectedRadioButton = questionBlockElement.querySelector('input[type="radio"]:checked');
+            if (!selectedRadioButton) {
+                alert("Please select an answer first.");
+                return;
+            }
+            const selectedOptionKey = selectedRadioButton.value;
+            const qData = quizData[questionIndex];
+            const feedbackDiv = questionBlockElement.querySelector('.feedback');
+            const correct = selectedOptionKey === qData.correctAnswer;
+
+            let feedbackHTML = '';
+            if (correct) {
+                feedbackHTML = `<span class="feedback-status">Correct!</span>`;
+                feedbackDiv.className = 'feedback correct';
+            } else {
+                feedbackHTML = `<span class="feedback-status">Incorrect. The correct answer is ${qData.correctAnswer}.</span>`;
+                feedbackDiv.className = 'feedback incorrect';
+            }
+
+            feedbackHTML += `<div class="feedback-rationale"><strong>Rationale:</strong> ${qData.rationale}</div>`;
+            feedbackHTML += `<div class="feedback-source"><strong>Source:</strong> ${qData.source}</div>`;
+
+            feedbackDiv.innerHTML = feedbackHTML;
+        }
+
+        themeToggleButton.addEventListener('click', () => {
+            if (bodyElement.classList.contains('light-theme')) {
+                applyTheme('dark');
+            } else {
+                applyTheme('light');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('quizTheme') || 'dark';
+            applyTheme(savedTheme);
+            loadQuiz();
+        });
+    </script>
+</body>
+</html>
