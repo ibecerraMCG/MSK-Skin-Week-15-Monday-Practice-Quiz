@@ -1390,7 +1390,7 @@ function save(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); 
 const sections = [];
 quizData.forEach(q => { if (!sections.includes(q.section)) sections.push(q.section); });
 function shortLabel(name) {
-    const map = {};
+    const map = {"Posterior Forearm and Dorsum of Hand":"Posterior Forearm & Hand","Introduction to Rheumatologic Disease":"Intro to Rheumatologic Disease"};
     return map[name] || name;
 }
 window.__bbShortLabel = shortLabel;
